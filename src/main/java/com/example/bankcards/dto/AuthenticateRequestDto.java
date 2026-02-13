@@ -1,13 +1,19 @@
 package com.example.bankcards.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 public class AuthenticateRequestDto {
+    @NotBlank
+    @Size(max=35)
     private String username;
-    private char[] password;
+    @NotBlank
+    @Size(min=6, max=35)
+    private String password;
 
     public AuthenticateRequestDto(@JsonProperty("username") String username,
-                                  @JsonProperty("password") char[] password){
+                                  @JsonProperty("password") String password){
         this.username = username;
         this.password = password;
     }
@@ -20,11 +26,11 @@ public class AuthenticateRequestDto {
         this.username = username;
     }
 
-    public char[] getPassword() {
+    public String getPassword() {
         return password;
     }
 
-    public void setPassword(char[] password) {
+    public void setPassword(String password) {
         this.password = password;
     }
 }

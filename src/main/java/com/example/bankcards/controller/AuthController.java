@@ -1,7 +1,14 @@
 package com.example.bankcards.controller;
 
+import com.example.bankcards.dto.AuthResponseDto;
 import com.example.bankcards.dto.AuthenticateRequestDto;
+import com.example.bankcards.dto.ErrorResponseDto;
+import com.example.bankcards.dto.RegisterRequestDto;
 import com.example.bankcards.service.AuthService;
+import jakarta.validation.Valid;
+import java.util.List;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,40 +23,54 @@ import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.BindException;
+import org.springframework.validation.ObjectError;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.util.Map;
 
+import static java.util.stream.Collectors.toList;
+
+@Validated
 @RestController
+@Slf4j
 @RequestMapping("/auth")
 public class AuthController {
 
-    private final AuthenticationManager authManager;
     private final AuthService authService;
 
     @Autowired
-    public AuthController(AuthenticationManager authManager, AuthService authService) {
-        this.authManager = authManager;
+    public AuthController( AuthService authService) {
         this.authService = authService;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> authenticate(AuthenticateRequestDto authRequest){
-
-        try {
-            Authentication auth = authManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
-            String jwt = authService.formJwt((UserDetails) auth.getPrincipal());
-            return new ResponseEntity<>(Map.of("message", "success", "jwt", jwt), HttpStatus.OK);
-        } catch (AuthenticationException e){
-            return new ResponseEntity<>(Map.of("error", e.getMessage()),HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<AuthResponseDto> authenticate(@RequestBody @Valid AuthenticateRequestDto authRequest){
+        String jwt = authService.authenticateAndCreateJwt(authRequest);
+        return ResponseEntity.ok(new AuthResponseDto(jwt));
     }
 
-    //TODO add registration
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponseDto> authenticationExceptionHandler(AuthenticationException e){
+        return new ResponseEntity<>(new ErrorResponseDto(e.getMessage()),HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(BindException.class)
+    public ResponseEntity<ErrorResponseDto> authenticationExceptionHandler(BindException e){
+        List<String> errorMessages = e.getAllErrors().stream().map(ObjectError::getDefaultMessage).toList();
+        return new ResponseEntity<>(new ErrorResponseDto(errorMessages),HttpStatus.BAD_REQUEST);
+    }
+
+
+    @PostMapping("/register")
+    public ResponseEntity<AuthResponseDto> register(@RequestBody @Valid RegisterRequestDto registerRequest){
+        log.trace("Received register request: " + registerRequest);
+        String jwt = authService.registerAndCreateJwt(registerRequest);
+        return ResponseEntity.ok(new AuthResponseDto(jwt));
+    }
 
 
     @GetMapping("/test")

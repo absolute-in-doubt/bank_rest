@@ -3,14 +3,25 @@ package com.example.bankcards.entity;
 import com.example.bankcards.enums.UserStatus;
 import com.example.bankcards.enums.Role;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.hibernate.id.factory.spi.GenerationTypeStrategy;
 
 
 @Entity
 @Table(name="users")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_seq")
+    @SequenceGenerator(
+            name = "user_sequence",
+            sequenceName = "user_sequence",
+            allocationSize = 20
+    )
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_sequence")
     @Column(name="id")
     private long id;
     @Column(name="first_name")
@@ -22,8 +33,10 @@ public class User {
     @Column(name="password")
     private String passwordHash;
     @Column(name="status")
+    @Enumerated(EnumType.STRING)
     private UserStatus status;
     @Column(name="role")
+    @Enumerated(EnumType.STRING)
     private Role role;
 
     public long getId() {

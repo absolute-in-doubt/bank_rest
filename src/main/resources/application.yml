@@ -1,23 +1,27 @@
 spring:
   config:
-    import: optional:classpath:application-secrets.yml
+    import: ["classpath:application-secret.yml"]
   security:
+    paths:
+      public: /auth/login, /auth/test, /auth/register
     jwt:
       ttl_minutes: 15
-    public_paths: ["/auth/login"]
 
-datasource:
-  url: "jdbc:postgresql://localhost:5432/enziberg_bl"
-  username: "postgres"
-  password: "root"
-  driver-class-name: "org.postgresql.Driver"
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bank_rest
+    username: postgres
+    password: root
+    driver-class-name: org.postgresql.Driver
 
-jpa:
-  hibernate:
-    dialect: "org.hibernate.dialect.PostgreSQLDialect"
+  jpa:
+    hibernate:
+      dialect: org.hibernate.dialect.PostgreSQLDialect
 
-#Что нужно сделать:
-#  - Указать настройки подключения к базе данных.
-#  - Указать порт приложения.
-#  - Настроить параметры безопасности и JWT.
-#  - Включить Swagger UI.
+server:
+  address:
+    "127.0.0.1"
+  port:
+    "8080"
+
+
+
