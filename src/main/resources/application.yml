@@ -4,8 +4,7 @@ spring:
   security:
     jwt:
       ttl_minutes: 15
-    public_paths:
-      - "/auth/login"
+    public_paths: ["/auth/login"]
 
 datasource:
   url: "jdbc:postgresql://localhost:5432/enziberg_bl"
