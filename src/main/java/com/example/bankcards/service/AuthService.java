@@ -5,6 +5,7 @@ import com.example.bankcards.dto.RegisterRequestDto;
 import com.example.bankcards.entity.User;
 import com.example.bankcards.enums.Role;
 import com.example.bankcards.repository.UserRepository;
+import com.example.bankcards.security.UserDetailsImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +56,6 @@ public class AuthService {
 
     public String registerAndCreateJwt(RegisterRequestDto registerRequest){
         String hashedPassword = passwordEncoder.encode(registerRequest.getPassword());
-        log.debug("hashedPassword length: " + hashedPassword.length());
         User user = User.builder()
                 .firstName(registerRequest.getFirstName())
                 .lastName(registerRequest.getLastName())

@@ -27,6 +27,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if(userOpt.isEmpty())
             throw new UsernameNotFoundException("User not found");
         User user = userOpt.get();
-        return new UserDetailsImpl(user.getUsername(), user.getPasswordHash());
+        return new UserDetailsImpl(user.getUsername(), user.getPasswordHash(), user.getId());
     }
 }
