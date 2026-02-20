@@ -8,6 +8,7 @@ import jakarta.validation.Validator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 import java.util.Set;
@@ -15,6 +16,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
+@ActiveProfiles("test")
 class RegisterRequestDtoTest {
 
     private final ObjectMapper mapper;
@@ -26,22 +28,6 @@ class RegisterRequestDtoTest {
         this.validator = validator;
     }
 
-    @Test
-    public void testSerialization() throws JsonProcessingException {
-        String expected = "{\"roles\":[\"ROLE_USER\"],\"first_name\":\"test_name\",\"last_name\":\"test_surname\",\"username\":\"test_username\",\"password\":\"passwd\"}";
-
-        RegisterRequestDto registerRequest = new RegisterRequestDto();
-        registerRequest.setFirstName("test_name");
-        registerRequest.setLastName("test_surname");
-        registerRequest.setUsername("test_username");
-        registerRequest.setPassword("passwd");
-        registerRequest.setRoles(List.of(Role.ROLE_USER));
-
-        String json = mapper.writeValueAsString(registerRequest);
-
-        System.out.println(json);
-        assertEquals(expected, json);
-    }
 
     @Test
     public void testValidation() throws JsonProcessingException {

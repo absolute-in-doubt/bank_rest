@@ -63,7 +63,7 @@ class CardServiceTest {
             User user = User.builder()
                     .firstName("test-user")
                     .lastName("n-" + i)
-                    .role(Role.ROLE_USER)
+                    .roles(List.of(Role.ROLE_USER))
                     .status(UserStatus.ACTIVE)
                     .passwordHash("we don't really need it here")
                     .cards(List.of(card))
@@ -125,8 +125,9 @@ class CardServiceTest {
         User sender = users.get(0);
         User recipient = users.get(1);
 
-        Card senderCard = cardRepo.findById(1L).get();
-        Card recipientCard = cardRepo.findById(2L).get();
+        List<Card> cards = cardRepo.findAll();
+        Card senderCard = cards.get(0);
+        Card recipientCard = cards.get(1);
 
         TransferRequestDto request = new TransferRequestDto();
         request.setCardId(senderCard.getCardId());
@@ -167,8 +168,9 @@ class CardServiceTest {
             executorService.shutdownNow();
         }
 
-        senderCard = cardRepo.findById(1L).get();
-        recipientCard = cardRepo.findById(2L).get();
+        cards = cardRepo.findAll();
+        senderCard = cards.get(0);
+        recipientCard = cards.get(1);
         assertEquals(new BigDecimal("50.00"), senderCard.getBalance());
         assertEquals(new BigDecimal("250.00"), recipientCard.getBalance());
         executorService.close();
@@ -181,8 +183,9 @@ class CardServiceTest {
         User sender = users.get(0);
         User recipient = users.get(1);
 
-        Card senderCard = cardRepo.findById(1L).get();
-        Card recipientCard = cardRepo.findById(2L).get();
+        List<Card> cards = cardRepo.findAll();
+        Card senderCard = cards.get(0);
+        Card recipientCard = cards.get(1);
 
         TransferRequestDto request = new TransferRequestDto();
         request.setCardId(senderCard.getCardId());
@@ -223,8 +226,9 @@ class CardServiceTest {
             executorService.shutdownNow();
         }
 
-        senderCard = cardRepo.findById(1L).get();
-        recipientCard = cardRepo.findById(2L).get();
+        cards = cardRepo.findAll();
+        senderCard = cards.get(0);
+        recipientCard = cards.get(1);
         assertEquals(new BigDecimal("0.00"), senderCard.getBalance());
         assertEquals(new BigDecimal("300.00"), recipientCard.getBalance());
         executorService.close();

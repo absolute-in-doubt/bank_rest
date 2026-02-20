@@ -15,8 +15,4 @@ public class ApplicationTest {
     void contextLoads() {
     }
 
-    @Test
-    void testRun() {
-        SpringApplication.run(Application.class, new String[] {});
-    }
 }

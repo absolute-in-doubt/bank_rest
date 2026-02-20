@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,7 +23,7 @@ class CardDtoMapperTest {
     void toDto() {
         User user = User.builder()
                 .id(111)
-                .role(Role.ROLE_USER)
+                .roles(List.of(Role.ROLE_USER))
                 .username("test_username")
                 .firstName("first_name")
                 .lastName("last_name")

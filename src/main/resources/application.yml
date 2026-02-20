@@ -8,9 +8,9 @@ spring:
       ttl_minutes: 15
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/bank_rest
-    username: postgres
-    password: root
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/bank_rest}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:root}
     driver-class-name: org.postgresql.Driver
 
   liquibase:
@@ -23,7 +23,7 @@ spring:
         connection:
           isolation: READ_COMMITTED
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        ddl-auto: none
+        ddl-auto: validate
 
 server:
   address:

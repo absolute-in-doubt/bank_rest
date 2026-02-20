@@ -41,6 +41,7 @@ public class Card {
     private User owner;
     @Column(name="expiration_date")
     private Date expirationDate;
+    @Enumerated(EnumType.STRING)
     @Column(name="status")
     private CardStatus status;
     @Column(name="balance")
