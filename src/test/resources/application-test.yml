@@ -1,4 +1,6 @@
 spring:
+  main:
+    allow-bean-definition-overriding: true #to resolve issue with springdoc
   config:
     import: ["classpath:application-secret.yml"]
   security:
@@ -14,6 +16,15 @@ spring:
     driver-class-name: org.h2.Driver
 
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    hibernate:
-      ddl-auto: create
+    properties:
+      hibernate:
+        connection:
+          isolation: READ_COMMITTED
+        dialect: org.hibernate.dialect.H2Dialect
+        ddl-auto: create
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false

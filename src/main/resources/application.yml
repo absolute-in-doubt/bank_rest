@@ -13,9 +13,17 @@ spring:
     password: root
     driver-class-name: org.postgresql.Driver
 
+  liquibase:
+    enabled: true
+    change-log: db/migration/main-changelog.xml
+
   jpa:
-    hibernate:
-      dialect: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        connection:
+          isolation: READ_COMMITTED
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        ddl-auto: none
 
 server:
   address:
@@ -23,5 +31,7 @@ server:
   port:
     "8080"
 
-
+springdoc:
+  packagesToScan: com.example.bankcards.controller
+  enable-spring-security: true
 

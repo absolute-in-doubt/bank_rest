@@ -11,6 +11,9 @@ package com.example.bankcards.entity;
 
 import com.example.bankcards.enums.CardStatus;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -18,6 +21,9 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name="cards")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Card {
     @Id
     @Column(name="card_id")

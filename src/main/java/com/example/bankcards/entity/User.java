@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 import org.hibernate.id.factory.spi.GenerationTypeStrategy;
 
+import java.util.List;
+
 
 @Entity
 @Table(name="users")
@@ -38,6 +40,8 @@ public class User {
     @Column(name="role")
     @Enumerated(EnumType.STRING)
     private Role role;
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+    private List<Card> cards;
 
     public long getId() {
         return id;
@@ -93,5 +97,13 @@ public class User {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public List<Card> getCards(){
+        return this.cards;
+    }
+
+    public void setCards(List<Card> cards){
+        this.cards = cards;
     }
 }

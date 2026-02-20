@@ -14,11 +14,16 @@
         <appender-ref ref="CONSOLE"/>
     </logger>
 
+    <!--
     <logger name="org.springframework.core.env" level="TRACE"/>
     <logger name="org.springframework.boot.context.properties" level="TRACE"/>
     <logger name="org.springframework.security" level="DEBUG"/>
+    -->
+    <logger name="com.example.bankcards.service" level="TRACE" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
 
-    <root level="DEBUG">
+    <root level="INFO">
         <appender-ref ref="CONSOLE"/>
     </root>
 </configuration>

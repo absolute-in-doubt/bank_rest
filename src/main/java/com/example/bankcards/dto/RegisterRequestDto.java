@@ -48,7 +48,7 @@ public class RegisterRequestDto {
     }
 
     @JsonSetter(value="roles")
-    public List<Role> getRoles() {
-        return roles;
+    public void setRoles(List<Role> roles){
+        this.roles = roles;
     }
 }

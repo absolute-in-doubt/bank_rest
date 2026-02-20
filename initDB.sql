@@ -3,6 +3,7 @@ CREATE DATABASE bank_rest;
 \c bank_rest;
 
 CREATE SEQUENCE user_sequence START 1 INCREMENT 20;
+CREATE SEQUENCE card_sequence START 1 INCREMENT 20;
 
 CREATE TABLE "users" (
     id BIGINT PRIMARY KEY,
@@ -13,3 +14,12 @@ CREATE TABLE "users" (
     status VARCHAR(7),
     role VARCHAR(10)
 );
+
+CREATE TABLE "cards" (
+    id BIGINT PRIMARY KEY,
+    user_id BIGINT REFERENCES users(id),
+    cardNumber CHAR(16),
+    status VARCHAR(7),
+    balance DECIMAL(15,4),
+    version INT
+)
