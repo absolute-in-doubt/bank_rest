@@ -54,7 +54,7 @@ public class AuthService {
         return formJwt(userDetails.getUsername(), authorities);
     }
 
-    public String registerAndCreateJwt(RegisterRequestDto registerRequest){
+    public void register(RegisterRequestDto registerRequest){
         String hashedPassword = passwordEncoder.encode(registerRequest.getPassword());
         User user = User.builder()
                 .firstName(registerRequest.getFirstName())
@@ -63,6 +63,10 @@ public class AuthService {
                 .passwordHash(hashedPassword)
                 .build();
         userRepository.save(user);
+    }
+
+    public String registerAndCreateJwt(RegisterRequestDto registerRequest){
+        register(registerRequest);
         List<String> authorities = registerRequest.getRoles().stream().map(Role::toString).toList();
         return formJwt(registerRequest.getUsername(), authorities);
     }

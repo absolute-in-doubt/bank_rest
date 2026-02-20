@@ -3,10 +3,11 @@ package com.example.bankcards.entity;
 import com.example.bankcards.enums.UserStatus;
 import com.example.bankcards.enums.Role;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.Type;
 import org.hibernate.id.factory.spi.GenerationTypeStrategy;
+import org.hibernate.type.SqlTypes;
 
 import java.util.List;
 
@@ -16,6 +17,8 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 public class User {
     @Id
     @SequenceGenerator(
@@ -37,73 +40,9 @@ public class User {
     @Column(name="status")
     @Enumerated(EnumType.STRING)
     private UserStatus status;
-    @Column(name="role")
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "roles", columnDefinition = "jsonb", nullable = false)
+    private List<Role> roles;
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     private List<Card> cards;
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getPasswordHash() {
-        return passwordHash;
-    }
-
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
-    }
-
-    public UserStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(UserStatus status) {
-        this.status = status;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public List<Card> getCards(){
-        return this.cards;
-    }
-
-    public void setCards(List<Card> cards){
-        this.cards = cards;
-    }
 }

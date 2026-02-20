@@ -23,4 +23,12 @@ public class CardSpecification {
         return (root, query, cb) -> number == null ? null
                 : cb.like(cb.lower(root.get("cardNumber")), "%" + number.toLowerCase() + "%");
     }
+
+    public static Specification<Card> hasOwnerId(Long userId) {
+        return (root, query, criteriaBuilder) ->
+                criteriaBuilder.equal(
+                        root.get("owner").get("id"),
+                        userId
+                );
+    }
 }

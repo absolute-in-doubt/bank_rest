@@ -1,17 +1,12 @@
 package com.example.bankcards.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
+@AllArgsConstructor
 public class ErrorResponseDto {
     private Object error;
-
-    public ErrorResponseDto(Object error){
-        this.error = error;
-    }
-
-    public Object getError() {
-        return error;
-    }
-
-    public void setError(Object error) {
-        this.error = error;
-    }
 }

@@ -35,8 +35,4 @@ public interface CardRepository extends JpaRepository<Card, Long>, JpaSpecificat
 
     //optimistically
     Optional<Card> findByCardNumber(String cardNumber);
-
-    @Query("SELECT c FROM Card c WHERE c.owner.id = :userId")
-    Page<Card> findByUserId(@Param("userId") Long userId, Pageable pageable);
-
 }

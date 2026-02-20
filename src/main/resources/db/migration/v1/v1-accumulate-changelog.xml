@@ -26,7 +26,10 @@
             <column name="username" type="varchar(35)"/>
             <column name="password" type="varchar(68)"/>
             <column name="status" type="varchar(7)"/>
-            <column name="role" type="varchar(10)"/>
+            <column name="roles" type="JSONB" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="int"/>
         </createTable>
     </changeSet>
 
@@ -43,11 +46,10 @@
             <column name="user_id" type="bigint">
                 <constraints nullable="false" references="users(id)" foreignKeyName="fk_cards_user"/>
             </column>
-            <column name="last_name" type="varchar(25)"/>
-            <column name="username" type="varchar(35)"/>
-            <column name="password" type="varchar(68)"/>
+            <column name="card_number" type="char(16)"/>
             <column name="status" type="varchar(7)"/>
-            <column name="role" type="varchar(10)"/>
+            <column name="balance" type="decimal(15,4)"/>
+            <column name="version" type="int"/>
         </createTable>
     </changeSet>
 

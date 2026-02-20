@@ -12,7 +12,8 @@ CREATE TABLE "users" (
     username VARCHAR(35),
     password CHAR(68),
     status VARCHAR(7),
-    role VARCHAR(10)
+    roles JSONB,
+    version int
 );
 
 CREATE TABLE "cards" (

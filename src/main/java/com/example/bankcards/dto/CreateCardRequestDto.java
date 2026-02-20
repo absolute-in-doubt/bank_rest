@@ -14,4 +14,6 @@ public class CreateCardRequestDto {
     @NotNull
     @Positive
     private int cardLifetimeYears;
+    @NotNull
+    private Long userId;
 }

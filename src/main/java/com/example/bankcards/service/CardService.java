@@ -85,29 +85,29 @@ public class CardService {
         cardRepository.delete(cardOpt.get());
     }
 
-    public void changeCardStatus(Long userId, Long cardId) throws CardNotFoundException {
+    public void changeCardStatus(Long userId, Long cardId, CardStatus newStatus) throws CardNotFoundException {
         int maxRetries = 3;
         for (int i = maxRetries; i > 0; i--) {
             try {
-                tryChangeCardStatusOptimistically(userId, cardId);
+                tryChangeCardStatusOptimistically(userId, cardId, newStatus);
                 return;
             } catch (ObjectOptimisticLockingFailureException e){
                 log.trace("Failed to block card optimistically. Retries left: {}", i);
             }
         }
-        performChangeCardStatusPessimistically(userId, cardId);
+        performChangeCardStatusPessimistically(userId, cardId, newStatus);
 
     }
 
 
-    private void tryChangeCardStatusOptimistically(Long userId, Long cardId) throws CardNotFoundException {
+    private void tryChangeCardStatusOptimistically(Long userId, Long cardId, CardStatus newStatus) throws CardNotFoundException {
         TransactionStatus txStat = transactionManager.getTransaction(new DefaultTransactionDefinition());
         try {
             Optional<Card> cardOpt = cardRepository.findByCardIdAndUserId(userId, cardId);
 
             if (cardOpt.isEmpty())
                 throw new CardNotFoundException("Card with id " + cardId + " doesn't exist");
-            cardOpt.get().setStatus(CardStatus.BLOCKED);
+            cardOpt.get().setStatus(newStatus);
 
             transactionManager.commit(txStat);
         } catch (TransactionException e){
@@ -116,14 +116,14 @@ public class CardService {
         }
     }
 
-    private void performChangeCardStatusPessimistically(Long userId, Long cardId) throws CardNotFoundException {
+    private void performChangeCardStatusPessimistically(Long userId, Long cardId, CardStatus newStatus) throws CardNotFoundException {
         TransactionStatus txStat = transactionManager.getTransaction(new DefaultTransactionDefinition());
         try {
             Optional<Card> cardOpt = cardRepository.findByCardIdAndUserIdWithPessimisticLock(userId, cardId);
 
             if (cardOpt.isEmpty())
                 throw new CardNotFoundException("Card with id " + cardId + " doesn't exist");
-            cardOpt.get().setStatus(CardStatus.BLOCKED);
+            cardOpt.get().setStatus(newStatus);
 
             transactionManager.commit(txStat);
         } catch (TransactionException e){
@@ -140,12 +140,22 @@ public class CardService {
         return cardDtoMapper.toDtoList(cardRepository.findAll(spec, pageable).toList());
     }
 
-    public void createNewCard(CreateCardRequestDto request, Long userId) throws UserNotFoundException {
+    public List<CardDto> getUserCards(Long userId, CardFilter filter, Pageable pageable){
+        Specification<Card> spec = Specification.allOf(
+                CardSpecification.hasStatus(filter.getStatus()),
+                CardSpecification.cardNumberContains(filter.getCardNumber()),
+                CardSpecification.balanceGreaterThan(filter.getMinBalance()),
+                CardSpecification.hasOwnerId(userId));
+
+        return cardDtoMapper.toDtoList(cardRepository.findAll(spec, pageable).toList());
+    }
+
+    public void createNewCard(CreateCardRequestDto request) throws UserNotFoundException {
         int maxRetries = 5;
         Date expirationDate = Date.valueOf(LocalDate.now().plusYears(request.getCardLifetimeYears()));
 
-        Optional<User> userOpt = userRepository.findById(userId);
-        User user = userOpt.orElseThrow(() -> new UserNotFoundException("Couldn't find user with id: " +  userId));
+        Optional<User> userOpt = userRepository.findById(request.getUserId());
+        User user = userOpt.orElseThrow(() -> new UserNotFoundException("Couldn't find user with id: " +  request.getUserId()));
 
         Card card = Card.builder()
                 .balance(new BigDecimal(0))
