@@ -4,6 +4,7 @@ import com.example.bankcards.dto.AuthenticateRequestDto;
 import com.example.bankcards.dto.RegisterRequestDto;
 import com.example.bankcards.entity.User;
 import com.example.bankcards.enums.Role;
+import com.example.bankcards.enums.UserStatus;
 import com.example.bankcards.repository.UserRepository;
 import com.example.bankcards.security.UserDetailsImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -47,8 +48,7 @@ public class AuthService {
     }
 
     public String authenticateAndCreateJwt(AuthenticateRequestDto authRequest) throws AuthenticationException{
-        String hashedPassword = passwordEncoder.encode(authRequest.getPassword());
-        Authentication auth = authManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), hashedPassword));
+        Authentication auth = authManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
         UserDetails userDetails = (UserDetails) auth.getPrincipal();
         List<String> authorities = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
         return formJwt(userDetails.getUsername(), authorities);
@@ -57,6 +57,8 @@ public class AuthService {
     public void register(RegisterRequestDto registerRequest){
         String hashedPassword = passwordEncoder.encode(registerRequest.getPassword());
         User user = User.builder()
+                .status(UserStatus.ACTIVE)
+                .roles(registerRequest.getRoles())
                 .firstName(registerRequest.getFirstName())
                 .lastName(registerRequest.getLastName())
                 .username(registerRequest.getUsername())
