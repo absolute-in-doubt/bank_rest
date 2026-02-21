@@ -35,7 +35,7 @@ public class RegisterRequestDto {
     private String username;
     @Schema(description = "Password. password must contain at least one letter, one digit and one special symbol. (6 =< password size =< 35).")
     @Size(min=6, max=35, message="password size shouldn't be between 6 and 35 characters")
-    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\\\d)(?=.*[@$!%*#?^&amp;])[A-Za-z\\\\d@$!%*#?^&amp;]{3,}",
+    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?^&])[A-Za-z\\d@$!%*#?^&]{3,}$",
             message = "password must contain at least one letter, one digit and one special symbol")
     private String password;
     @Schema(description = "User's roles ('ROLE_USER', 'ROLE_ADMIN').")
