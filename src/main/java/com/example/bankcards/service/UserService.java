@@ -1,7 +1,6 @@
 package com.example.bankcards.service;
 
-import com.example.bankcards.dto.RegisterRequestDto;
-import com.example.bankcards.dto.UpdateRequestDto;
+import com.example.bankcards.dto.UpdateUserRequestDto;
 import com.example.bankcards.dto.UserDto;
 import com.example.bankcards.entity.User;
 import com.example.bankcards.exception.ServerBusyException;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.util.List;
@@ -52,7 +50,7 @@ public class UserService {
         userRepository.delete(user);
     }
 
-    public void updateUser(UpdateRequestDto request) throws UserNotFoundException, ServerBusyException {
+    public void updateUser(UpdateUserRequestDto request) throws UserNotFoundException, ServerBusyException {
         int maxRetries = 3;
         for(int i = maxRetries; i > 0; i--) {
             try {
