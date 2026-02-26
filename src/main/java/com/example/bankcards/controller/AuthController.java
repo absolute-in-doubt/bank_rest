@@ -39,7 +39,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponseDto> register(@RequestBody @Valid RegisterRequestDto registerRequest){
-        log.trace("Received register request: {}", registerRequest);
+        //log.trace("Received register request: {}", registerRequest);
         String jwt = authService.registerAndCreateJwt(registerRequest);
         return ResponseEntity.ok(new AuthResponseDto(jwt));
     }

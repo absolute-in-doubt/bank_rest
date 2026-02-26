@@ -45,4 +45,6 @@ public class User {
     private List<Role> roles;
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     private List<Card> cards;
+    @Version
+    private int version;
 }
