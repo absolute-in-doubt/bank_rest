@@ -46,7 +46,9 @@
             <column name="user_id" type="bigint">
                 <constraints nullable="false" references="users(id)" foreignKeyName="fk_cards_user"/>
             </column>
-            <column name="card_number" type="char(16)"/>
+            <column name="card_number" type="char(16)">
+                <constraints unique="true" uniqueConstraintName="uk_card_number"/>
+            </column>
             <column name="status" type="varchar(7)"/>
             <column name="balance" type="decimal(15,4)"/>
             <column name="version" type="int"/>

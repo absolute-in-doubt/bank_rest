@@ -4,6 +4,7 @@ import com.example.bankcards.dto.*;
 import com.example.bankcards.enums.CardStatus;
 import com.example.bankcards.exception.CardNotFoundException;
 import com.example.bankcards.exception.InsufficientBalanceException;
+import com.example.bankcards.exception.ServerBusyException;
 import com.example.bankcards.exception.UserNotFoundException;
 import com.example.bankcards.security.UserDetailsImpl;
 import com.example.bankcards.service.CardService;
@@ -81,7 +82,7 @@ public class CardsController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("admin/card")
-    public ResponseEntity<Void> createNewCard(@RequestBody @Valid CreateCardRequestDto request) throws UserNotFoundException {
+    public ResponseEntity<Void> createNewCard(@RequestBody @Valid CreateCardRequestDto request) throws UserNotFoundException, ServerBusyException {
         cardService.createNewCard(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -116,5 +117,10 @@ public class CardsController {
     @ExceptionHandler({InterruptedException.class})
     public ResponseEntity<ErrorResponseDto> internalErrorsHandler(InterruptedException e){
         return new ResponseEntity<>(new ErrorResponseDto(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(ServerBusyException.class)
+    public ResponseEntity<ErrorResponseDto> serverBusyExceptionHandler(ServerBusyException e){
+        return new ResponseEntity<>(new ErrorResponseDto(e.getMessage()), HttpStatus.SERVICE_UNAVAILABLE);
     }
 }

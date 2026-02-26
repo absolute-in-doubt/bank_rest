@@ -1,5 +1,6 @@
 package com.example.bankcards.service;
 
+import com.example.bankcards.dto.CreateCardRequestDto;
 import com.example.bankcards.dto.TransferRequestDto;
 import com.example.bankcards.entity.Card;
 import com.example.bankcards.entity.User;
@@ -9,6 +10,8 @@ import com.example.bankcards.enums.Role;
 import com.example.bankcards.enums.UserStatus;
 import com.example.bankcards.exception.CardNotFoundException;
 import com.example.bankcards.exception.InsufficientBalanceException;
+import com.example.bankcards.exception.ServerBusyException;
+import com.example.bankcards.exception.UserNotFoundException;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.repository.UserRepository;
 import com.example.bankcards.util.CardNumberManager;
@@ -28,6 +31,7 @@ import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -232,5 +236,76 @@ class CardServiceTest {
         assertEquals(new BigDecimal("0.00"), senderCard.getBalance());
         assertEquals(new BigDecimal("300.00"), recipientCard.getBalance());
         executorService.close();
+    }
+
+    @Test
+    public void createNewCardTest() throws UserNotFoundException, ServerBusyException {
+        List<User> users = userRepo.findAll();
+        log.debug("All users: {}", users);
+        User user = users.getFirst();
+
+        CreateCardRequestDto request = new CreateCardRequestDto();
+        request.setUserId(user.getId());
+        request.setCardType(CardType.VISA);
+        request.setCardLifetimeYears(4);
+
+        log.debug("Trying to create a new card:");
+        cardService.createNewCard(request);
+
+        List<Card> cards = cardRepo.findAll().stream().filter(c -> c.getOwner().getId() == user.getId() ).toList();
+        assertEquals(2, cards.size());
+    }
+
+    @Test
+    public void createNewCardTest_Multithreading() throws UserNotFoundException {
+        int amtOfThreads = 50;
+        List<User> users = userRepo.findAll();
+        log.debug("All users: {}", users);
+        User user = users.getFirst();
+
+        final CreateCardRequestDto request = new CreateCardRequestDto();
+        request.setUserId(user.getId());
+        request.setCardType(CardType.VISA);
+        request.setCardLifetimeYears(4);
+
+        CyclicBarrier barrier = new CyclicBarrier(amtOfThreads);
+        AtomicInteger amtOfRequestsFailed = new AtomicInteger(0);
+
+        Runnable runnable = () -> {
+            try {
+                barrier.await();
+                log.info("{} tries to create a new card", Thread.currentThread().getName());
+
+                cardService.createNewCard(request);
+            } catch (ServerBusyException e) {
+                //It isn't expected to encounter many fails on such a small amount of requests
+                log.info("{} failed to create a new card due to fail of creating a unique card number", Thread.currentThread().getName());
+                amtOfRequestsFailed.incrementAndGet();
+            } catch (UserNotFoundException | InterruptedException | BrokenBarrierException e) {
+                log.warn("{} failed to create a new card: {}: {}", Thread.currentThread().getName(), e.getClass(), e.getMessage());
+                throw new RuntimeException(e);
+            }
+        };
+
+
+        ExecutorService executorService = Executors.newFixedThreadPool(50);
+
+        for(int i = 0; i < amtOfThreads; i++){
+            executorService.submit(runnable);
+        }
+
+        executorService.shutdown();
+        try {
+            if (!executorService.awaitTermination(60, TimeUnit.SECONDS)) {
+                executorService.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executorService.shutdownNow();
+        }
+
+        log.info("Amount of requests failed: {}", amtOfRequestsFailed.get());
+
+        List<Card> cards = cardRepo.findAll().stream().filter(c -> c.getOwner().getId() == user.getId() ).toList();
+        assertEquals(amtOfThreads + 1 - amtOfRequestsFailed.get(), cards.size());
     }
 }

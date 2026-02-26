@@ -9,6 +9,7 @@ import com.example.bankcards.entity.User;
 import com.example.bankcards.enums.CardStatus;
 import com.example.bankcards.exception.CardNotFoundException;
 import com.example.bankcards.exception.InsufficientBalanceException;
+import com.example.bankcards.exception.ServerBusyException;
 import com.example.bankcards.exception.UserNotFoundException;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.repository.UserRepository;
@@ -139,7 +140,7 @@ public class CardService {
         return cardDtoMapper.toDtoList(cardRepository.findAll(spec, pageable).toList());
     }
 
-    public void createNewCard(CreateCardRequestDto request) throws UserNotFoundException {
+    public void createNewCard(CreateCardRequestDto request) throws UserNotFoundException, ServerBusyException {
         int maxRetries = 5;
         Date expirationDate = Date.valueOf(LocalDate.now().plusYears(request.getCardLifetimeYears()));
 
@@ -156,10 +157,12 @@ public class CardService {
             try{
                 card.setCardNumber(cardNumberManager.generateCardNumber(request.getCardType()));
                 cardRepository.save(card);
+                return;
             } catch (DataIntegrityViolationException e) {
                 log.trace("Failed to save new card to the DB. Retries left: {}", i);
             }
         }
+        throw  new ServerBusyException("Failed to create new card. Too many requests");
     }
 
 

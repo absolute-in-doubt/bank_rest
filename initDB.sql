@@ -19,7 +19,7 @@ CREATE TABLE "users" (
 CREATE TABLE "cards" (
     id BIGINT PRIMARY KEY,
     user_id BIGINT REFERENCES users(id),
-    cardNumber CHAR(16),
+    cardNumber CHAR(16) UNIQUE,
     status VARCHAR(7),
     balance DECIMAL(15,4),
     version INT
